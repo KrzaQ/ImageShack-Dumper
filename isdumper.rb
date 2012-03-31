@@ -2,7 +2,7 @@ require 'httpclient'
 require 'uri'
 require 'ftools'
 require 'thread'
-#require 'net/http'
+require 'net/http'
 
 class ISDumper
 
@@ -87,6 +87,12 @@ class ISDumper
 		while result == nil
 			begin
 				result = @http.get_content(link)
+			rescue HTTPClient::ConnectTimeoutError
+				result = nil
+				sleep 1
+			rescue Errno::ETIMEDOUT
+				result = nil
+				sleep 1
 			rescue HTTPClient::BadResponseError
 				tries = tries + 1
 				result = nil
