@@ -7,7 +7,6 @@ require 'thread'
 class ISDumper
 
 	attr_accessor :username, :password, :images
-	attr_accessor :is_id, :is_myimages, :is_username
 	attr_accessor :imagesCount, :pagesCount
 	
 	def initialize(username, password)
@@ -33,26 +32,13 @@ class ISDumper
 		# {status: false}
 		return false if dataHash.count == 1
 		
-		@is_id = dataHash['id']
-		@is_myimages = dataHash['myimages']
-		@is_username = dataHash['username']
-		
 		return true
 	end
 
 	def GetLinkList
 		res = @http.get 'http://my.imageshack.us/v_images.php'
-		
-		
-		
-		#res.instance_variables.each do |v|
-		#	puts "_#{v}_ #{res.instance_variable_get v}"
-		#end
-		#puts res.to_s
-		
+				
 		str = res.body.to_s
-		
-		#puts str
 		
 		#<input type="hidden" id="inumpages" value="42"/>
 		numPagesRE = /<input type="hidden" id="inumpages" value="(\d+)"\/>/m
@@ -74,10 +60,6 @@ class ISDumper
 			currentPage = currentPage + 2
 			puts "Getting links... #{@listOfLinks.count} (finished #{100.0*(currentPage-1)/@pagesCount}%)"
 		end
-		
-		#@listOfLinks.each do |l|
-		#	puts l
-		#end
 		
 		puts "Found #{@listOfLinks.count} links (#{@imagesCount - @listOfLinks.count} missing)"
 		
@@ -105,20 +87,13 @@ class ISDumper
 		while result == nil
 			begin
 				result = @http.get_content(link)
-			#rescue Timeout::Error
-			#	result = nil
-			#	sleep 0.5
-			#rescue EOFError
-			#	result = nil
-			#	sleep 0.5
-			#rescue Errno::ETIMEDOUT
-			#	result = nil
-			#	sleep 0.5
 			rescue HTTPClient::BadResponseError
-				puts "can't download #{link} :("
 				tries = tries + 1
-				return nil if tries > 2
 				result = nil
+				if tries > 2:
+					puts "can't download #{link} :("
+					return result
+				end
 				sleep 0.5
 			end
 		end
@@ -127,12 +102,13 @@ class ISDumper
 	
 	def DownloadAll(dir,threadCount = 10)
 		
-		#@listOfLinks.push 'http://img185.imageshack.us/img185/1198/areyoupolish5fw.jpg'
 		fails = 0
 		done = 0
 		total = @listOfLinks.count
 		l = Mutex.new
 		threads = []
+		
+		Dir.mkdir(dir) if not File::exist?(dir)
 		
 		for unnecessary in 0...threadCount
 		

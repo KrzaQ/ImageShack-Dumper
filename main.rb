@@ -19,6 +19,12 @@ if not options.include?('p') or not options.include?('u'):
 	exit()
 end
 
+dir = 'imageshack-dump'
+dir = options['d'] if options.include?('d')
+
+threads = 12
+threads = options['t'].to_i if options.include?('t')
+
 dump = ISDumper.new(options['u'],options['p'])
 
 if not dump.Login():
@@ -28,4 +34,4 @@ end
 
 dump.GetLinkList
 
-dump.DownloadAll('dir',10)
+dump.DownloadAll(dir,threads)
