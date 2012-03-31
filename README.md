@@ -7,7 +7,7 @@
 `ruby main.rb [options]`
 
 Available options:
--   -u=[username] - username, *mandatory*
--   -p=[password] - password, *mandatory*
--   -t=[number] - number of threads used for concurrent downloads, optional (default 12)
--   -d=[path] - directory where the images will be downloaded (default: imageshack-dump in current working directory)
+-   `-u=[username]` - username, *mandatory* (if not supplied, user will be prompted do that from stdin)
+-   `-p=[password]` - password, *mandatory* (if not supplied, user will be prompted do that from stdin)
+-   `-t=[number]` - number of threads used for concurrent downloads, optional (default 12)
+-   `-d=[path]` - directory where the images will be downloaded (default: imageshack-dump in current working directory)
