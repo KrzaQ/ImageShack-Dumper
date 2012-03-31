@@ -16,11 +16,13 @@ end
 
 if not options.include?('u'):
 	print 'please type your username: '
+	STDOUT.flush
 	options['u'] = STDIN.gets.gsub("\n",'')
 end
 
 if not options.include?('p'):
 	print 'please type your password: '
+	STDOUT.flush
 	options['p'] = STDIN.gets.gsub("\n",'')
 end
 
