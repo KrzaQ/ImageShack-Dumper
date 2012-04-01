@@ -13,3 +13,7 @@ Available options:
 * `-t=[number]` - number of threads used for concurrent downloads, optional (default: 12)
 * `-d=[path]` - directory where the images will be downloaded (default: imageshack-dump in current working directory)
 * `-timestamp=[true/false]` - if true, a unix timestamp of upload time (?) will be prepended to the filename. (default: false)
+
+# License
+- - -
+LGPL 2.1
