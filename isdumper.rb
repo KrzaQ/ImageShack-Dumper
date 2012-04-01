@@ -118,7 +118,7 @@ class ISDumper
 				end
 				result = resp.body
 				
-			rescue HTTPClient::ConnectTimeoutError, HTTPClient::BadResponseError, Errno::ETIMEDOUT, SocketError
+			rescue HTTPClient::ConnectTimeoutError, HTTPClient::BadResponseError, Errno::EINVAL, Errno::ETIMEDOUT, SocketError
 				tries = tries + 1
 				if tries > 2:
 					@bucketSync.synchronize { @bucketOfFail.push link }
