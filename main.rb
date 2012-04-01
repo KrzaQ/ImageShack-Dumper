@@ -37,7 +37,11 @@ dir = options['d'] if options.include?('d')
 threads = 12
 threads = options['t'].to_i if options.include?('t')
 
+prependTimestamp = false
+prependTimestamp = options['timestamp'] == 'true' if options.include?('timestamp')
+
 dump = ISDumper.new(options['u'],options['p'])
+dump.prependTimestamp = prependTimestamp
 
 if not dump.Login():
 	puts "login failed."
@@ -46,8 +50,12 @@ end
 
 dump.GetLinkList
 
-#for i in 0...dump.listOfLinks.count
-#	puts "#{i}, #{dump.listOfLinks[i]}"
-#end
-
 dump.DownloadAll(dir,threads)
+
+puts "saving failed, but possibly recoverable (non 404'd) links to failed.txt"
+
+f = File.new(dir+'/failed.txt',"w")
+dump.bucketOfFail.each do |link|
+	f.puts link
+end
+f.close
