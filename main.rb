@@ -46,4 +46,8 @@ end
 
 dump.GetLinkList
 
+#for i in 0...dump.listOfLinks.count
+#	puts "#{i}, #{dump.listOfLinks[i]}"
+#end
+
 dump.DownloadAll(dir,threads)

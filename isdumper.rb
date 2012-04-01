@@ -8,16 +8,20 @@ class ISDumper
 
 	attr_accessor :username, :password, :images
 	attr_accessor :imagesCount, :pagesCount
+	attr_accessor :listOfLinks
 	
 	def initialize(username, password)
 		@username = username
 		@password = password
 		@cookiesHash = {}
 		@listOfLinks = []
+		@http = HTTPClient.new
+		
+		@bucketOfFail = []
+		@bucketSync = Mutex.new
 	end
 
 	def Login
-		@http = HTTPClient.new
 		post = {:username => @username, :password => @password, :stay_logged_in => 'true', :format => 'json'}
 		res = @http.post('http://imageshack.us/auth.php', post)
 		
@@ -84,13 +88,35 @@ class ISDumper
 	def DownloadOne(link)
 		tries = 0
 		result = nil
+		begin
 		while result == nil
 			begin
-				result = @http.get_content(link)
+				resp = @http.get(link)
+				
+				case resp.http_header.status_code
+				when 404
+					#puts "Image #{link} does not exist"
+					return nil
+				when 200
+					#do nothing lol
+				else
+					puts "Code #{resp.http_header.status_code} from #{link}"
+				end
+				result = resp.body
 			rescue HTTPClient::ConnectTimeoutError
+				tries = tries + 1
+				if tries > 2:
+					@bucketSync.synchronize { @bucketOfFail.push link }
+					return nil
+				end
 				result = nil
 				sleep 1
 			rescue Errno::ETIMEDOUT
+				tries = tries + 1
+				if tries > 2:
+					@bucketSync.synchronize { @bucketOfFail.push link }
+					return nil
+				end
 				result = nil
 				sleep 1
 			rescue HTTPClient::BadResponseError
@@ -103,6 +129,12 @@ class ISDumper
 				sleep 0.5
 			end
 		end
+
+		rescue Exception => e 
+			puts "unknown error #{e} for #{link}"
+			return nil
+		end
+		
 		return result
 	end
 	
@@ -129,7 +161,7 @@ class ISDumper
 					if data == nil:
 						l.synchronize{
 							fails = fails + 1
-							puts "#{done}/#{total} (fails: #{fails})"
+							puts "#{done+fails}/#{total} (saved #{done}, failed #{fails})"
 							lnk = @listOfLinks.pop
 						}
 						next
@@ -149,7 +181,7 @@ class ISDumper
 					
 					l.synchronize{
 						done = done + 1
-						puts "#{done}/#{total} (fails: #{fails})"
+						puts "#{done+fails}/#{total} (saved #{done}, failed #{fails})"
 						lnk = @listOfLinks.pop
 					}
 				end
