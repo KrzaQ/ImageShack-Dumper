@@ -16,4 +16,4 @@ Available options:
 
 # License
 - - -
-LGPL 2.1
+Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
