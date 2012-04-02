@@ -3,7 +3,7 @@ require 'net/http'
 require 'ftools'
 require 'thread'
 
-require 'isdumper'
+require File.dirname(__FILE__)+'/isdumper'
 
 options = {}
 
